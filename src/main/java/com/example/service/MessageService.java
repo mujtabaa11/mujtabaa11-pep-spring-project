@@ -14,44 +14,41 @@ public class MessageService {
     @Autowired
     private MessageRepository messageRepository;
 
-    // Create a new message
     public Message createMessage(Message message) {
-        return messageRepository.save(message); // Save message to the database
+        return messageRepository.save(message);
     }
 
-    // Get all messages
     public List<Message> getAllMessages() {
-        return messageRepository.findAll(); // Retrieve all messages
+        return messageRepository.findAll();
     }
 
-    // Get a message by its ID
     public Optional<Message> getMessageById(Integer messageId) {
-        return messageRepository.findById(messageId); // Find message by ID
+        return messageRepository.findById(messageId);
     }
 
-    // Delete a message by ID
     public boolean deleteMessage(Integer messageId) {
         if (messageRepository.existsById(messageId)) {
-            messageRepository.deleteById(messageId); // Delete the message
+            messageRepository.deleteById(messageId);
             return true;
         }
-        return false; // Return false if the message does not exist
+        return false;
     }
 
-    // Update message text by ID
     public boolean updateMessage(Integer messageId, String newMessageText) {
         Optional<Message> existingMessage = messageRepository.findById(messageId);
+
         if (existingMessage.isPresent() && !newMessageText.isBlank() && newMessageText.length() <= 255) {
+
             Message message = existingMessage.get();
-            message.setMessageText(newMessageText); // Update the message text
-            messageRepository.save(message); // Save updated message
+            message.setMessageText(newMessageText);
+            messageRepository.save(message);
+
             return true;
         }
-        return false; // Return false if message doesn't exist or validation fails
+        return false;
     }
 
-    // Get all messages written by a particular user
     public List<Message> getMessagesByAccount(Integer accountId) {
-        return messageRepository.findByPostedBy(accountId); // Retrieve messages for a specific user
+        return messageRepository.findByPostedBy(accountId);
     }
 }

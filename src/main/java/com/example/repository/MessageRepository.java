@@ -6,6 +6,5 @@ import java.util.List;
 
 public interface MessageRepository extends JpaRepository<Message, Integer> {
 
-    // Find all messages by the user (postedBy refers to the accountId)
     List<Message> findByPostedBy(Integer accountId);
 }

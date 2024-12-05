@@ -4,6 +4,7 @@ import com.example.entity.Account;
 import com.example.entity.Message;
 import com.example.service.AccountService;
 import com.example.service.MessageService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class SocialMediaController {
         }
         Account createdAccount = accountService.registerAccount(account);
         if (createdAccount == null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build(); // username already exists
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
         return ResponseEntity.status(HttpStatus.OK).body(createdAccount);
     }
@@ -67,30 +68,36 @@ public class SocialMediaController {
     @GetMapping("/messages/{messageId}")
     public ResponseEntity<Message> getMessageById(@PathVariable Integer messageId) {
         Optional<Message> message = messageService.getMessageById(messageId);
-        return message.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        
+        if (message.isPresent()) {
+            return ResponseEntity.ok(message.get());
+        } else {
+            return ResponseEntity.ok().build();
+        }
     }
 
     // 6. Delete a message
     @DeleteMapping("/messages/{messageId}")
-    public ResponseEntity<Void> deleteMessage(@PathVariable Integer messageId) {
+    public ResponseEntity<Integer> deleteMessage(@PathVariable Integer messageId) {
         boolean deleted = messageService.deleteMessage(messageId);
         if (deleted) {
+            return ResponseEntity.ok(1);
+        } else {
             return ResponseEntity.ok().build();
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     // 7. Update a message
     @PatchMapping("/messages/{messageId}")
-    public ResponseEntity<Void> updateMessage(@PathVariable Integer messageId, @RequestBody Message message) {
+    public ResponseEntity<?> updateMessage(@PathVariable Integer messageId, @RequestBody Message message) {
         if (message.getMessageText().isBlank() || message.getMessageText().length() > 255) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         boolean updated = messageService.updateMessage(messageId, message.getMessageText());
         if (updated) {
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(1);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     // 8. Get all messages by a particular user
